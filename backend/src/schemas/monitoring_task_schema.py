@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, HttpUrl
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, HttpUrl, field_serializer
 
 
 class MonitoringTaskBase(BaseModel):
@@ -36,6 +36,10 @@ class MonitoringTaskBase(BaseModel):
     notification_emails: list[EmailStr] = Field(
         default_factory=list, description="Список email ответственных лиц"
     )
+
+    @field_serializer("url")
+    def serialize_url(self, value: HttpUrl) -> str:
+        return str(value)
 
 
 class MonitoringTaskCreate(MonitoringTaskBase):
