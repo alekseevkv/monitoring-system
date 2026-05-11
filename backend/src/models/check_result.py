@@ -1,25 +1,20 @@
-from datetime import datetime
-
-from sqlalchemy import func
 from sqlalchemy import Boolean, Float, String, ForeignKey, Integer, Text, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.models.base import Base
+from src.models.base import Base, BaseModelMixin
 
 
-class CheckResult(Base):
+class CheckResult(Base, BaseModelMixin):
     __tablename__ = "check_results"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     monitoring_task_id: Mapped[int] = mapped_column(
         ForeignKey("monitoring_tasks.id", ondelete="CASCADE"),
         nullable=False
     )
-    check_timestamp: Mapped[datetime] = mapped_column(server_default=func.now())
     # Результат
-    is_success: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    is_success: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     status_code: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    response_time_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
+    response_time_s: Mapped[float | None] = mapped_column(Float, nullable=True)
     # Сырые данные ответа
     response_headers: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     response_body_preview: Mapped[str | None] = mapped_column(
