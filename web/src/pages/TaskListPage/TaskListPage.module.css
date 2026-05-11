@@ -17,3 +17,12 @@
   padding-inline: 10px;
   min-height: 0;
 }
+
+.addButton {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding-block: 10px;
+  background-color: #fff;
+}

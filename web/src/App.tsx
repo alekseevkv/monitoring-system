@@ -3,14 +3,16 @@ import { Route, Routes } from 'react-router';
 import { Layout } from '@/components/Layout/Layout';
 import { MainPage } from '@/pages/MainPage/MainPage';
 import { ReportPage } from '@/pages/ReportPage/ReportPage';
-import { TasksPage } from '@/pages/TasksPage/TasksPage';
+import { TaskListPage } from '@/pages/TaskListPage/TaskListPage';
+import { TaskPage } from '@/pages/TaskPage/TaskPage';
 
 export const App = () => {
   return (
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<MainPage />} />
-        <Route path="tasks" element={<TasksPage />} />
+        <Route path="tasks" element={<TaskListPage />} />
+        <Route path="/tasks/:tid" element={<TaskPage />} />
         <Route path="report" element={<ReportPage />} />
       </Route>
     </Routes>

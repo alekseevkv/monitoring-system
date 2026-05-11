@@ -1,4 +1,5 @@
 import { api } from '@/api';
+import { taskReducer } from '@/slices/taskSlice/taskSlice';
 import { configureStore } from '@reduxjs/toolkit';
 
 import type { AxiosInstance } from 'axios';
@@ -7,7 +8,9 @@ const extraArg: ThunkExtraArg = {
 };
 
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    task: taskReducer,
+  },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       thunk: {
