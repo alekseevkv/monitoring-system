@@ -21,4 +21,7 @@ export type TaskSchema = {
   tasks: Task[];
   tasksLoading: boolean;
   tasksError: string | null;
+  task: Task | null;
+  taskLoading: boolean;
+  taskError: string | null;
 };

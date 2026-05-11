@@ -5,9 +5,9 @@ import { useAppDispatch } from '@/hook';
 import { fetchTasks } from '@/slices/taskSlice/services/fetchTasks';
 import { Button } from '@mantine/core';
 
-import classes from './TasksPage.module.css';
+import classes from './TaskListPage.module.css';
 
-export const TasksPage = () => {
+export const TaskListPage = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
