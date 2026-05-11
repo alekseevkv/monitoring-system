@@ -1,9 +1,38 @@
 .header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   height: 50px;
   padding-inline: 20px;
   flex-shrink: 0;
   border-bottom: 1px solid #dee2e6;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #e64980;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #e64980;
+}
+
+.link {
+  border-radius: 8px;
+  padding: 4px 6px;
+  flex-shrink: 0;
+  width: 110px;
+
+  &:first-child {
+    width: 158px;
+  }
 }
