@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-grow: 1;
+  min-height: 0;
+  padding-block: 10px;
+  overflow: auto;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 940px;
+  width: 100%;
+  padding-inline: 10px;
+  min-height: 0;
+}
