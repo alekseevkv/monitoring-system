@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router';
 
+import { TaskForm } from '@/components/TaskForm/TaskForm';
 import { useAppDispatch, useAppSelector } from '@/hook';
 import { getTask } from '@/slices/taskSlice/selectors';
 import { fetchTask } from '@/slices/taskSlice/services/fetchTask';
@@ -30,7 +31,9 @@ export const TaskPage = () => {
 
   return (
     <div className={classes.container}>
-      <div className={classes.content}></div>
+      <div className={classes.content}>
+        <TaskForm initialValues={task} />
+      </div>
     </div>
   );
 };

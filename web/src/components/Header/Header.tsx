@@ -1,4 +1,4 @@
-import { Link, NavLink as RouterNavLink, useMatch } from 'react-router';
+import { Link, NavLink as RouterNavLink } from 'react-router';
 
 import { Anchor, NavLink } from '@mantine/core';
 import { HeartbeatIcon } from '@phosphor-icons/react';
@@ -6,9 +6,6 @@ import { HeartbeatIcon } from '@phosphor-icons/react';
 import classes from './Header.module.css';
 
 export const Header = () => {
-  const isTasksPage = useMatch('/tasks');
-  const isReportPage = useMatch('/report');
-
   return (
     <header className={classes.header}>
       <div className={classes.titleWrapper}>
@@ -25,18 +22,18 @@ export const Header = () => {
       <div className={classes.navbar}>
         <NavLink
           component={RouterNavLink}
-          to="/tasks"
+          to="/tasks/"
           label="Сервисы мониторинга"
           variant="subtle"
-          active={Boolean(isTasksPage)}
+          end
           className={classes.link}
         />
         <NavLink
           component={RouterNavLink}
-          to="/report"
+          to="/report/"
           label="Сводный отчет"
           variant="subtle"
-          active={Boolean(isReportPage)}
+          end
           className={classes.link}
         />
       </div>

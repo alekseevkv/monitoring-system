@@ -25,3 +25,19 @@ export type TaskSchema = {
   taskLoading: boolean;
   taskError: string | null;
 };
+
+export type TaskFormValues = {
+  name: string;
+  is_active: boolean;
+  url: string;
+  http_method: string;
+  timeout: number;
+  expected_status_code: number;
+  sla_target: number;
+  check_interval_seconds: number;
+  responsible_persons: string[];
+  notification_emails: string[];
+  headers?: string;
+  description?: string;
+  cron_expression?: string;
+};
