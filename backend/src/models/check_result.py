@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Float, String, ForeignKey, Integer, Text, JSON
+from sqlalchemy import Boolean, Float, String, ForeignKey, Integer, Text, JSON, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.base import Base, BaseModelMixin
@@ -6,6 +6,9 @@ from src.models.base import Base, BaseModelMixin
 
 class CheckResult(Base, BaseModelMixin):
     __tablename__ = "check_results"
+    __table_args__ = (
+        Index("ix_check_results_task_created", "monitoring_task_id", "created_at"),
+    )
 
     monitoring_task_id: Mapped[int] = mapped_column(
         ForeignKey("monitoring_tasks.id", ondelete="CASCADE"),

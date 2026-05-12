@@ -1,6 +1,6 @@
 from sqlalchemy import JSON, Boolean, Float, Integer, String, Text
 from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.base import Base, BaseModelMixin
 
@@ -27,3 +27,13 @@ class MonitoringTask(Base, BaseModelMixin):
     # Ответственные и уведомления
     responsible_persons: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
     notification_emails: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
+
+    check_results = relationship(
+        "CheckResult", back_populates="monitoring_task", cascade="all, delete-orphan"
+    )
+    incidents = relationship(
+        "Incident", back_populates="monitoring_task", cascade="all, delete-orphan"
+    )
+    daily_metrics = relationship(
+        "DailyMetric", back_populates="monitoring_task", cascade="all, delete-orphan"
+    )
