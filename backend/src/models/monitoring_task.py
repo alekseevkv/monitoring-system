@@ -1,6 +1,5 @@
 from sqlalchemy import JSON, Boolean, Float, Integer, String, Text
-from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.base import Base, BaseModelMixin
 
@@ -24,6 +23,9 @@ class MonitoringTask(Base, BaseModelMixin):
     check_interval_seconds: Mapped[int] = mapped_column(Integer, default=300)
     cron_expression: Mapped[str | None] = mapped_column(String(255))
 
-    # Ответственные и уведомления
-    responsible_persons: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
-    notification_emails: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
+    # Ответственные
+    responsible_persons: Mapped[list["ResponsiblePerson"]] = relationship(  # type: ignore  # noqa: F821
+        "ResponsiblePerson",
+        back_populates="monitoring_task",
+        cascade="all, delete-orphan",
+    )
