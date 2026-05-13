@@ -11,6 +11,6 @@ class ResponsiblePerson(Base, BaseModelMixin):
     email: Mapped[str] = mapped_column(String(255), nullable=False)
 
     monitoring_task_id: Mapped[int] = mapped_column(ForeignKey("monitoring_tasks.id"))
-    monitoring_task: Mapped["MonitoringTask"] = relationship(  # noqa: F821 # type: ignore
+    monitoring_task: Mapped["MonitoringTask"] = relationship(  # type: ignore # noqa: F821
         "MonitoringTask", back_populates="responsible_persons"
     )

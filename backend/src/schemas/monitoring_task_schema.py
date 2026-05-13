@@ -3,6 +3,31 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, HttpUrl, field_serializer
 
 
+class ResponsiblePersonRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    email: EmailStr
+    created_at: datetime
+    updated_at: datetime
+
+
+class ResponsiblePersonCreate(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    name: str = Field(..., min_length=1, max_length=255)
+    email: EmailStr = Field(..., min_length=1, max_length=255)
+
+
+class ResponsiblePersonNested(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int | None = None
+    name: str = Field(..., min_length=1, max_length=255)
+    email: EmailStr = Field(..., min_length=1, max_length=255)
+
+
 class MonitoringTaskBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -30,26 +55,20 @@ class MonitoringTaskBase(BaseModel):
         None, max_length=255, description="Cron-расписание"
     )
 
-    responsible_persons: list[str] = Field(
-        default_factory=list, description="Список ответственных лиц"
-    )
-    notification_emails: list[EmailStr] = Field(
-        default_factory=list, description="Список email ответственных лиц"
-    )
-
     @field_serializer("url")
     def serialize_url(self, value: HttpUrl) -> str:
         return str(value)
 
 
 class MonitoringTaskCreate(MonitoringTaskBase):
-    pass
+    responsible_persons: list[ResponsiblePersonCreate] = Field(default_factory=list)
 
 
 class MonitoringTaskRead(MonitoringTaskBase):
     id: int
     created_at: datetime
     updated_at: datetime
+    responsible_persons: list[ResponsiblePersonRead] = Field(default_factory=list)
 
 
 class MonitoringTaskUpdate(BaseModel):
@@ -68,5 +87,8 @@ class MonitoringTaskUpdate(BaseModel):
     sla_target: float | None = Field(None, ge=0.0, le=100.0)
     check_interval_seconds: int | None = Field(None, ge=10)
     cron_expression: str | None = Field(None, max_length=255)
-    responsible_persons: list[str] | None = None
-    notification_emails: list[EmailStr] | None = None
+    responsible_persons: list[ResponsiblePersonNested] | None = None
+
+    @field_serializer("url")
+    def serialize_url(self, value: HttpUrl) -> str:
+        return str(value)
