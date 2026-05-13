@@ -96,6 +96,13 @@ class MonitoringTaskRepository:
         await self.db.commit()
         return True
 
+    async def get_active(self) -> list[MonitoringTask]:
+        stmt = (
+            select(MonitoringTask)
+            .where(MonitoringTask.is_active.is_(True))
+        )
+        result = await self.db.execute(stmt)
+        return list(result.scalars().all())
 
 async def get_monitoring_task_repository(
     db: AsyncSession = Depends(get_session),

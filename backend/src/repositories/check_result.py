@@ -1,3 +1,4 @@
+from typing import Sequence
 from datetime import datetime
 
 from fastapi import Depends
@@ -6,19 +7,30 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_session
 from src.models.check_result import CheckResult
-from src.schemas.check_result_schema import CheckResultCreate
 
 
 class CheckResultRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def create(self, data: CheckResultCreate) -> CheckResult:
-        result = CheckResult(**data.model_dump())
+    async def create(self, data: dict) -> CheckResult:
+        result = CheckResult(**data)
         self.db.add(result)
         await self.db.commit()
         await self.db.refresh(result)
         return result
+    
+    async def update(self, check_id: int, data: dict) -> CheckResult | None:
+        check = await self.get_by_id(check_id)
+        if not check:
+            return None
+
+        for key, value in data.items():
+            setattr(check, key, value)
+        
+        await self.db.commit()
+        await self.db.refresh(check)
+        return check
 
     async def get_by_id(self, result_id: int) -> CheckResult | None:
         stmt = select(CheckResult).where(CheckResult.id == result_id)
@@ -27,7 +39,14 @@ class CheckResultRepository:
 
     async def get_by_task_id(
         self, task_id: int, skip: int = 0, limit: int = 50
-    ) -> list[CheckResult]:
+    ) -> tuple[Sequence[CheckResult], int]:
+        stmt = (
+            select(func.count())
+            .select_from(CheckResult)
+            .where(CheckResult.monitoring_task_id == task_id)
+        )
+        total = (await self.db.execute(stmt)).scalar_one()
+
         stmt = (
             select(CheckResult)
             .where(CheckResult.monitoring_task_id == task_id)
@@ -35,8 +54,8 @@ class CheckResultRepository:
             .offset(skip)
             .limit(limit)
         )
-        result = await self.db.execute(stmt)
-        return list(result.scalars().all())
+        result = list((await self.db.execute(stmt)).scalars().all())
+        return result, total
 
     async def get_by_time_range(
         self, task_id: int, start: datetime, end: datetime
@@ -84,6 +103,14 @@ class CheckResultRepository:
             "max_response_time": float(row.max_response_time) if row.max_response_time is not None else None,
         }
 
+    async def get_latest_by_task(self, task_id: int) -> CheckResult | None:
+        stmt = (
+            select(CheckResult)
+            .where(CheckResult.monitoring_task_id == task_id)
+            .order_by(CheckResult.created_at.desc())
+            .limit(1)
+        )
+        return (await self.db.execute(stmt)).scalar_one_or_none()
 
 async def get_check_result_repository(
     db: AsyncSession = Depends(get_session),

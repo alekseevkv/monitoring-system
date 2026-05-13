@@ -20,7 +20,8 @@ class Incident(Base, BaseModelMixin):
         nullable=False
     )
     status: Mapped[IncidentStatus] = mapped_column(
-        SAEnum(IncidentStatus), nullable=False, default=IncidentStatus.OPEN
+        SAEnum(IncidentStatus, values_callable=lambda enum: [e.value for e in enum]),
+        nullable=False, default=IncidentStatus.OPEN
     )
     started_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

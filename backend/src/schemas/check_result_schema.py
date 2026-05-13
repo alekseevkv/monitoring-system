@@ -3,10 +3,9 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class CheckResultCreate(BaseModel):
+class CheckResultBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    monitoring_task_id: int = Field(..., description="ID задачи мониторинга")
     is_success: bool = Field(..., description="Успешна ли проверка")
     status_code: int | None = Field(None, ge=100, le=599, description="HTTP статус-код ответа")
     response_time_s: float | None = Field(None, ge=0, description="Время ответа в секундах")
@@ -17,7 +16,24 @@ class CheckResultCreate(BaseModel):
     error_message: str | None = Field(None, description="Сообщение об ошибке")
 
 
-class CheckResultRead(CheckResultCreate):
+class CheckResultCreate(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    monitoring_task_id: int = Field(..., description="ID задачи мониторинга")
+
+
+class CheckResultUpdate(CheckResultBase):
+    pass
+
+
+class CheckResultRead(CheckResultBase):
+    monitoring_task_id: int
     id: int
     created_at: datetime
     updated_at: datetime
+
+
+class CheckResultListResponse(BaseModel):
+    items: list[CheckResultRead]
+    total: int
+    skip: int
+    limit: int
