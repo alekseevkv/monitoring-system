@@ -15,6 +15,7 @@ class MonitoringTask(Base, BaseModelMixin):
     url: Mapped[str] = mapped_column(String(2048), nullable=False)
     http_method: Mapped[str] = mapped_column(String(10), default="GET")
     headers: Mapped[dict | None] = mapped_column(JSON)
+    body: Mapped[dict | None] = mapped_column(JSON)
     timeout: Mapped[int] = mapped_column(Integer, default=30)
     expected_status_code: Mapped[int] = mapped_column(Integer, default=200)
 
