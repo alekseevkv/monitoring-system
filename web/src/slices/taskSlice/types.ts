@@ -13,6 +13,7 @@ export type Task = {
   created_at: string;
   updated_at: string;
   headers?: Record<string, string>;
+  body?: Record<string, string>;
   description?: string;
   cron_expression?: string;
 };
@@ -38,6 +39,7 @@ export type TaskFormValues = {
   responsible_persons: string[];
   notification_emails: string[];
   headers?: string;
+  body?: string;
   description?: string;
   cron_expression?: string;
 };

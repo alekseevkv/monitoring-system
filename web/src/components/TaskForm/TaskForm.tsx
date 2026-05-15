@@ -26,6 +26,7 @@ export const TaskForm = ({ initialValues }: Props) => {
       headers: initialValues.headers
         ? JSON.stringify(initialValues.headers)
         : undefined,
+      body: initialValues.body ? JSON.stringify(initialValues.body) : undefined,
     },
     validate: {
       name: hasLength({ min: 1, max: 255 }, 'Имя должно быть 1-255 символов'),
@@ -115,14 +116,28 @@ export const TaskForm = ({ initialValues }: Props) => {
               />
             </div>
           </Group>
-          <JsonInput
-            autosize
-            formatOnBlur
-            label="Кастомные HTTP-заголовки"
-            minRows={3}
-            key={form.key('headers')}
-            {...form.getInputProps('headers')}
-          />
+          <Group>
+            <div className={classes.inputWrapper}>
+              <JsonInput
+                autosize
+                formatOnBlur
+                label="Кастомные HTTP-заголовки"
+                minRows={3}
+                key={form.key('headers')}
+                {...form.getInputProps('headers')}
+              />
+            </div>
+            <div className={classes.inputWrapper}>
+              <JsonInput
+                autosize
+                formatOnBlur
+                label="Тело запроса"
+                minRows={3}
+                key={form.key('body')}
+                {...form.getInputProps('body')}
+              />
+            </div>
+          </Group>
         </Fieldset>
         <Fieldset legend="SLA и расписание">
           <Group>

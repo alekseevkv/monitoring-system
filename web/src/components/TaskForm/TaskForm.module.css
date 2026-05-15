@@ -1,5 +1,6 @@
 .inputWrapper {
   flex-grow: 1;
+  flex-basis: 10%;
 }
 
 .switch {
