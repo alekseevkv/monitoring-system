@@ -65,6 +65,7 @@ class CheckResultService:
 
     async def perform_http_check(self, task: MonitoringTask) -> CheckResultUpdate:
         start = time.perf_counter()
+        body = {} if task.http_method in ["POST", "PUT", "PATCH"] else None
         try:
             # Запрос
             async with httpx.AsyncClient(
@@ -75,6 +76,7 @@ class CheckResultService:
                     method=task.http_method,
                     url=str(task.url),
                     headers=task.headers or {},
+                    json=body
                 )
             response_time_s = round(float((time.perf_counter() - start)), 2)
             is_success = response.status_code == task.expected_status_code
