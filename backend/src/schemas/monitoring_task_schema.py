@@ -42,6 +42,7 @@ class MonitoringTaskBase(BaseModel):
         description="Методы запроса",
     )
     headers: dict | None = Field(None, description="Кастомные HTTP-заголовки")
+    body: dict | None = Field(None, description="Тело запроса")
     timeout: int = Field(30, ge=1, le=300, description="Таймаут в секундах")
     expected_status_code: int = Field(200, ge=100, le=599)
 
@@ -82,6 +83,7 @@ class MonitoringTaskUpdate(BaseModel):
         None, pattern="^(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)$"
     )
     headers: dict | None = None
+    body: dict | None = None
     timeout: int | None = Field(None, ge=1, le=300)
     expected_status_code: int | None = Field(None, ge=100, le=599)
     sla_target: float | None = Field(None, ge=0.0, le=100.0)

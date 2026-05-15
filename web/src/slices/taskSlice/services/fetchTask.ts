@@ -9,7 +9,7 @@ export const fetchTask = createAsyncThunk<Task, number, ThunkConfig<string>>(
   async (taskId, { rejectWithValue, extra }) => {
     try {
       const { data } = await extra.api.get<Task>(
-        `/monitoring_tasks/${taskId}/`,
+        `/monitoring-tasks/${taskId}/`,
       );
 
       if (!data) {

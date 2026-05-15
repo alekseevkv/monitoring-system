@@ -10,7 +10,7 @@ export const fetchTasks = createAsyncThunk<
   ThunkConfig<string>
 >('task/fetchTasks', async (_, { rejectWithValue, extra }) => {
   try {
-    const { data } = await extra.api.get<Task[]>('/monitoring_tasks/');
+    const { data } = await extra.api.get<Task[]>('/monitoring-tasks/');
 
     if (!data) {
       throw new Error();
