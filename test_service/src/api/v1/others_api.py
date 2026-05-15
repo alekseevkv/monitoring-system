@@ -77,6 +77,7 @@ async def info():
                 "description": "HEAD /ping → 200 OK",
                 "url": f"{BASE}/ping",
                 "headers": {},
+                "body": {},
                 "timeout": 5,
                 "http_method": "HEAD",
                 "expected_status_code": 200
@@ -86,6 +87,11 @@ async def info():
                 "description": "POST /api/v1/products → 201 Created",
                 "url": f"{BASE}/api/v1/products",
                 "headers": {},
+                "body": {
+                    "name": "Ноутбук",
+                    "price": 89999,
+                    "in_stock": True
+                },
                 "timeout": 5,
                 "http_method": "POST",
                 "expected_status_code": 201
@@ -95,6 +101,11 @@ async def info():
                 "description": "PUT /api/v1/products/1 → 200 OK",
                 "url": f"{BASE}/api/v1/products/1",
                 "headers": {},
+                "body": {
+                    "name": "Ноутбук",
+                    "price": 89999,
+                    "in_stock": True
+                },
                 "timeout": 5,
                 "http_method": "PUT",
                 "expected_status_code": 200
@@ -104,6 +115,7 @@ async def info():
                 "description": "GET /api/v1/products → 50% - 200 OK, 50% - 500 Internal Server Error",
                 "url": f"{BASE}/api/v1/products",
                 "headers": {},
+                "body": {},
                 "timeout": 5,
                 "http_method": "GET",
                 "expected_status_code": 200
@@ -113,6 +125,9 @@ async def info():
                 "description": "PATCH /api/v1/products/1 → 200 OK, каждый 3-й запрос - 503 Service Unavailable",
                 "url": f"{BASE}/api/v1/products/1",
                 "headers": {},
+                "body": {
+                    "in_stock": False
+                },
                 "timeout": 5,
                 "http_method": "PATCH",
                 "expected_status_code": 200
@@ -122,6 +137,7 @@ async def info():
                 "description": "GET /api/v1/products/report → 200 OK или timeout",
                 "url": f"{BASE}/api/v1/products/report",
                 "headers": {},
+                "body": {},
                 "timeout": 5,
                 "http_method": "GET",
                 "expected_status_code": 200
@@ -131,6 +147,7 @@ async def info():
                 "description": "DELETE /api/v1/products/1 → 500 Internal Server Error",
                 "url": f"{BASE}/api/v1/products/1",
                 "headers": {},
+                "body": {},
                 "timeout": 5,
                 "http_method": "DELETE",
                 "expected_status_code": 200
@@ -140,8 +157,9 @@ async def info():
                 "description": "GET /api/v1/admin → 200 OK или 401 Unauthorized",
                 "url": f"{BASE}/api/v1/admin",
                 "headers": {
-                "Authorization": "Bearer secret-123"
+                    "Authorization": "Bearer secret-123"
                 },
+                "body": {},
                 "timeout": 5,
                 "http_method": "GET",
                 "expected_status_code": 200
@@ -154,7 +172,8 @@ async def info():
                     "Origin": "http://backend:8000",
                     "Access-Control-Request-Method": "POST",
                     "Access-Control-Request-Headers": "Content-Type"
-                    },
+                },
+                "body": {},
                 "timeout": 5,
                 "http_method": "OPTIONS",
                 "expected_status_code": 200
