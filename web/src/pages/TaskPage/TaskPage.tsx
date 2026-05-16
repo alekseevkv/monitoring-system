@@ -32,6 +32,7 @@ export const TaskPage = () => {
   return (
     <div className={classes.container}>
       <div className={classes.content}>
+        <div className={classes.title}>Параметры сервиса</div>
         <TaskForm taskId={taskId} initialValues={task} />
       </div>
     </div>

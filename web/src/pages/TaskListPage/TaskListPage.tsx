@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router';
 
 import { TaskList } from '@/components/TaskList/TaskList';
 import { useAppDispatch } from '@/hook';
@@ -17,12 +18,10 @@ export const TaskListPage = () => {
   return (
     <div className={classes.container}>
       <div className={classes.content}>
+        <div className={classes.title}>Сервисы мониторинга</div>
         <TaskList />
         <div className={classes.addButton}>
-          <Button
-            // loading={}
-            onClick={() => {}}
-          >
+          <Button component={Link} to="/tasks/new/">
             Добавить сервис
           </Button>
         </div>

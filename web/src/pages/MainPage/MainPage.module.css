@@ -17,3 +17,8 @@
   padding-inline: 10px;
   min-height: 0;
 }
+
+.title {
+  font-size: 18px;
+  font-weight: 500;
+}

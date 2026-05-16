@@ -1,6 +1,9 @@
 import type { Task, TaskFormValues } from '@/slices/taskSlice/types';
+import { useNavigate } from 'react-router';
+
 import { useAppDispatch, useAppSelector } from '@/hook';
 import { getTaskLoading } from '@/slices/taskSlice/selectors';
+import { createTask } from '@/slices/taskSlice/services/createTask';
 import { updateTask } from '@/slices/taskSlice/services/updateTask';
 import {
     ActionIcon, Button, Fieldset, Group, JsonInput, NumberInput, Stack, Switch, Textarea, TextInput
@@ -12,11 +15,12 @@ import { TrashIcon } from '@phosphor-icons/react';
 import classes from './TaskForm.module.css';
 
 type Props = {
-  taskId: number;
-  initialValues: Task;
+  initialValues: Task | TaskFormValues;
+  taskId?: number;
 };
 
 export const TaskForm = ({ taskId, initialValues }: Props) => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const loading = useAppSelector(getTaskLoading);
 
@@ -94,7 +98,15 @@ export const TaskForm = ({ taskId, initialValues }: Props) => {
   return (
     <form
       onSubmit={form.onSubmit((values) => {
-        dispatch(updateTask({ taskId, task: values }));
+        if (taskId) {
+          dispatch(updateTask({ taskId, task: values }));
+        } else {
+          dispatch(createTask({ task: values })).then(({ meta, payload }) => {
+            if (meta.requestStatus === 'fulfilled' && (payload as Task)?.id) {
+              navigate(`/tasks/${(payload as Task).id}/`);
+            }
+          });
+        }
       })}
     >
       <Stack gap="4px">
@@ -232,7 +244,7 @@ export const TaskForm = ({ taskId, initialValues }: Props) => {
 
       <div className={classes.saveButton}>
         <Button type="submit" disabled={loading}>
-          Сохранить
+          {taskId ? 'Сохранить' : 'Создать'}
         </Button>
       </div>
     </form>

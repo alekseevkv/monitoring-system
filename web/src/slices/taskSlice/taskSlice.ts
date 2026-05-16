@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+import { createTask } from './services/createTask';
 import { fetchTask } from './services/fetchTask';
 import { fetchTasks } from './services/fetchTasks';
 import { updateTask } from './services/updateTask';
@@ -61,6 +62,18 @@ export const taskSlice = createSlice({
       state.task = action.payload;
     });
     builder.addCase(updateTask.rejected, (state, action) => {
+      state.taskLoading = false;
+      state.taskError = action.payload ?? null;
+    });
+    builder.addCase(createTask.pending, (state) => {
+      state.taskError = null;
+      state.taskLoading = true;
+    });
+    builder.addCase(createTask.fulfilled, (state, action) => {
+      state.taskLoading = false;
+      state.task = action.payload;
+    });
+    builder.addCase(createTask.rejected, (state, action) => {
       state.taskLoading = false;
       state.taskError = action.payload ?? null;
     });
