@@ -1,3 +1,11 @@
+export type ResponsiblePerson = {
+  id: number;
+  name: string;
+  email: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Task = {
   id: number;
   name: string;
@@ -8,10 +16,9 @@ export type Task = {
   expected_status_code: number;
   sla_target: number;
   check_interval_seconds: number;
-  responsible_persons: string[];
-  notification_emails: string[];
   created_at: string;
   updated_at: string;
+  responsible_persons: ResponsiblePerson[];
   headers?: Record<string, string>;
   body?: Record<string, string>;
   description?: string;
@@ -27,19 +34,21 @@ export type TaskSchema = {
   taskError: string | null;
 };
 
-export type TaskFormValues = {
-  name: string;
-  is_active: boolean;
-  url: string;
-  http_method: string;
-  timeout: number;
-  expected_status_code: number;
-  sla_target: number;
-  check_interval_seconds: number;
-  responsible_persons: string[];
-  notification_emails: string[];
+export type TaskFormValues = Omit<
+  Task,
+  | 'id'
+  | 'created_at'
+  | 'updated_at'
+  | 'headers'
+  | 'body'
+  | 'responsible_persons'
+> & {
   headers?: string;
   body?: string;
-  description?: string;
-  cron_expression?: string;
+  responsible_persons: {
+    name: string;
+    email: string;
+    id?: number;
+    key?: string;
+  }[];
 };

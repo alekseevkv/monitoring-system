@@ -32,7 +32,7 @@ export const TaskPage = () => {
   return (
     <div className={classes.container}>
       <div className={classes.content}>
-        <TaskForm initialValues={task} />
+        <TaskForm taskId={taskId} initialValues={task} />
       </div>
     </div>
   );

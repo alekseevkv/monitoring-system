@@ -16,9 +16,6 @@ class MonitoringTaskRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    def _with_persons(self):
-        return selectinload(MonitoringTask.responsible_persons)
-
     async def create(self, task_data: MonitoringTaskCreate) -> MonitoringTask:
         task_dict = task_data.model_dump(exclude={"responsible_persons"})
         task = MonitoringTask(**task_dict)
@@ -36,7 +33,7 @@ class MonitoringTaskRepository:
     async def get_by_id(self, task_id: int) -> MonitoringTask | None:
         stmt = (
             select(MonitoringTask)
-            .options(self._with_persons())
+            .options(selectinload(MonitoringTask.responsible_persons))
             .where(MonitoringTask.id == task_id)
         )
         result = await self.db.execute(stmt)
@@ -45,7 +42,7 @@ class MonitoringTaskRepository:
     async def get_all(self, skip: int = 0, limit: int = 50) -> list[MonitoringTask]:
         stmt = (
             select(MonitoringTask)
-            .options(self._with_persons())
+            .options(selectinload(MonitoringTask.responsible_persons))
             .offset(skip)
             .limit(limit)
         )
@@ -65,7 +62,8 @@ class MonitoringTaskRepository:
             setattr(task, field, value)
 
         if data.responsible_persons is not None:
-            new_persons_list = []
+            updated_ids = set()
+            new_persons = []
 
             for pd in data.responsible_persons:
                 update_dict = pd.model_dump(exclude={"id"}, exclude_unset=True)
@@ -76,16 +74,22 @@ class MonitoringTaskRepository:
                     if existing:
                         for k, v in update_dict.items():
                             setattr(existing, k, v)
-                        new_persons_list.append(existing)
+                        updated_ids.add(pd.id)
                     else:
-                        new_persons_list.append(ResponsiblePerson(**update_dict))
+                        new_person = ResponsiblePerson(**update_dict)
+                        self.db.add(new_person)
+                        new_persons.append(new_person)
                 else:
-                    new_persons_list.append(ResponsiblePerson(**update_dict))
+                    new_person = ResponsiblePerson(**update_dict)
+                    self.db.add(new_person)
+                    new_persons.append(new_person)
 
-            task.responsible_persons = new_persons_list
+            task.responsible_persons = [
+                p for p in task.responsible_persons if p.id in updated_ids
+            ] + new_persons
 
         await self.db.commit()
-        await self.db.refresh(task, attribute_names=["responsible_persons"])
+        await self.db.refresh(task)
         return task
 
     async def delete(self, task_id: int) -> bool:
@@ -97,12 +101,10 @@ class MonitoringTaskRepository:
         return True
 
     async def get_active(self) -> list[MonitoringTask]:
-        stmt = (
-            select(MonitoringTask)
-            .where(MonitoringTask.is_active.is_(True))
-        )
+        stmt = select(MonitoringTask).where(MonitoringTask.is_active.is_(True))
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
+
 
 async def get_monitoring_task_repository(
     db: AsyncSession = Depends(get_session),

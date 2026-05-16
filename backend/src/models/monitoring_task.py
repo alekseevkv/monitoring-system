@@ -28,6 +28,7 @@ class MonitoringTask(Base, BaseModelMixin):
     responsible_persons: Mapped[list["ResponsiblePerson"]] = relationship(  # type: ignore  # noqa: F821
         "ResponsiblePerson",
         back_populates="monitoring_task",
+        order_by="ResponsiblePerson.created_at, ResponsiblePerson.id",
         cascade="all, delete-orphan",
     )
 

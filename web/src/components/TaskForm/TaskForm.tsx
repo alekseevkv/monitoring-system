@@ -1,28 +1,34 @@
 import type { Task, TaskFormValues } from '@/slices/taskSlice/types';
+import { useAppDispatch, useAppSelector } from '@/hook';
+import { getTaskLoading } from '@/slices/taskSlice/selectors';
+import { updateTask } from '@/slices/taskSlice/services/updateTask';
 import {
-  Button,
-  Fieldset,
-  Group,
-  JsonInput,
-  NumberInput,
-  Stack,
-  Switch,
-  Textarea,
-  TextInput,
+    ActionIcon, Button, Fieldset, Group, JsonInput, NumberInput, Stack, Switch, Textarea, TextInput
 } from '@mantine/core';
 import { hasLength, isInRange, isUrl, matches, useForm } from '@mantine/form';
+import { randomId } from '@mantine/hooks';
+import { TrashIcon } from '@phosphor-icons/react';
 
 import classes from './TaskForm.module.css';
 
 type Props = {
+  taskId: number;
   initialValues: Task;
 };
 
-export const TaskForm = ({ initialValues }: Props) => {
+export const TaskForm = ({ taskId, initialValues }: Props) => {
+  const dispatch = useAppDispatch();
+  const loading = useAppSelector(getTaskLoading);
+
   const form = useForm<TaskFormValues>({
     mode: 'uncontrolled',
     initialValues: {
       ...initialValues,
+      responsible_persons: [
+        ...(initialValues.responsible_persons ?? []).map((person) => ({
+          ...person,
+        })),
+      ],
       headers: initialValues.headers
         ? JSON.stringify(initialValues.headers)
         : undefined,
@@ -54,8 +60,43 @@ export const TaskForm = ({ initialValues }: Props) => {
     },
   });
 
+  const responsiblePersonfields = form
+    .getValues()
+    .responsible_persons.map((item, index) => (
+      <Group key={item.id ?? item.key} align="flex-end">
+        <div className={classes.inputWrapper}>
+          <TextInput
+            withAsterisk
+            label="ФИО"
+            key={form.key(`responsible_persons.${index}.name`)}
+            {...form.getInputProps(`responsible_persons.${index}.name`)}
+          />
+        </div>
+        <div className={classes.inputWrapper}>
+          <TextInput
+            withAsterisk
+            label="Email"
+            key={form.key(`responsible_persons.${index}.email`)}
+            {...form.getInputProps(`responsible_persons.${index}.email`)}
+          />
+        </div>
+        <ActionIcon
+          variant="subtle"
+          size="md"
+          mb="4px"
+          onClick={() => form.removeListItem('responsible_persons', index)}
+        >
+          <TrashIcon style={{ width: '70%', height: '70%' }} />
+        </ActionIcon>
+      </Group>
+    ));
+
   return (
-    <form onSubmit={form.onSubmit((values) => console.log(values))}>
+    <form
+      onSubmit={form.onSubmit((values) => {
+        dispatch(updateTask({ taskId, task: values }));
+      })}
+    >
       <Stack gap="4px">
         <Group align="flex-end">
           <div className={classes.inputWrapper}>
@@ -169,11 +210,31 @@ export const TaskForm = ({ initialValues }: Props) => {
             </div>
           </Group>
         </Fieldset>
+        <Fieldset legend="Ответственные">
+          <Stack gap="6px">
+            {responsiblePersonfields}
+            <Group mt="md" justify="flex-end">
+              <Button
+                onClick={() =>
+                  form.insertListItem('responsible_persons', {
+                    name: '',
+                    email: '',
+                    key: randomId(),
+                  })
+                }
+              >
+                Добавить
+              </Button>
+            </Group>
+          </Stack>
+        </Fieldset>
       </Stack>
 
-      <Group mt="md" justify="flex-end">
-        <Button type="submit">Сохранить</Button>
-      </Group>
+      <div className={classes.saveButton}>
+        <Button type="submit" disabled={loading}>
+          Сохранить
+        </Button>
+      </div>
     </form>
   );
 };

@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { fetchTask } from './services/fetchTask';
 import { fetchTasks } from './services/fetchTasks';
+import { updateTask } from './services/updateTask';
 
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { TaskSchema } from './types';
@@ -48,6 +49,18 @@ export const taskSlice = createSlice({
       state.task = action.payload;
     });
     builder.addCase(fetchTask.rejected, (state, action) => {
+      state.taskLoading = false;
+      state.taskError = action.payload ?? null;
+    });
+    builder.addCase(updateTask.pending, (state) => {
+      state.taskError = null;
+      state.taskLoading = true;
+    });
+    builder.addCase(updateTask.fulfilled, (state, action) => {
+      state.taskLoading = false;
+      state.task = action.payload;
+    });
+    builder.addCase(updateTask.rejected, (state, action) => {
       state.taskLoading = false;
       state.taskError = action.payload ?? null;
     });
