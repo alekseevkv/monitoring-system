@@ -59,7 +59,7 @@ export const updateTask = createAsyncThunk<Task, Props, ThunkConfig<string>>(
 
       notifications.show({
         title: 'Сохранение',
-        message: 'Параметры задачи мониторинга успешно сохранены',
+        message: 'Параметры сервиса мониторинга успешно сохранены',
       });
 
       return data;

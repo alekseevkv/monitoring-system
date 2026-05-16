@@ -1,5 +1,8 @@
 import { useNavigate } from 'react-router';
 
+import { useAppDispatch } from '@/hook';
+import { deleteTask } from '@/slices/taskSlice/services/deleteTask';
+import { fetchTasks } from '@/slices/taskSlice/services/fetchTasks';
 import { ActionIcon, Card, Group, Text } from '@mantine/core';
 import { TrashIcon } from '@phosphor-icons/react';
 
@@ -11,6 +14,7 @@ type Props = {
 
 export const TaskItem = ({ id, name }: Props) => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   return (
     <Card
@@ -32,6 +36,11 @@ export const TaskItem = ({ id, name }: Props) => {
           size="md"
           onClick={(e) => {
             e.stopPropagation();
+            dispatch(deleteTask({ taskId: id })).then(({ meta }) => {
+              if (meta.requestStatus === 'fulfilled') {
+                dispatch(fetchTasks());
+              }
+            });
           }}
         >
           <TrashIcon style={{ width: '70%', height: '70%' }} />
