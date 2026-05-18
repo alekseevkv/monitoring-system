@@ -1,4 +1,4 @@
-"""Add check_results, incidents, daily_metrics tables
+"""Add check_results, incidents, monthly_metrics tables
 
 Revision ID: c7f3e2a1b9d4
 Revises: a35f8a4bbfc9
@@ -89,18 +89,22 @@ def upgrade() -> None:
     )
 
     op.create_table(
-        "daily_metrics",
+        "monthly_metrics",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("monitoring_task_id", sa.Integer(), nullable=False),
         sa.Column("date", sa.Date(), nullable=False),
         sa.Column("total_checks", sa.Integer(), nullable=False),
         sa.Column("successful_checks", sa.Integer(), nullable=False),
         sa.Column("failed_checks", sa.Integer(), nullable=False),
+        sa.Column("success_rate", sa.Float(), nullable=False),
+        sa.Column("total_downtime_seconds", sa.Float(), nullable=True),
+        sa.Column("total_uptime_seconds", sa.Float(), nullable=True),
+        sa.Column("incident_count", sa.Integer(), nullable=False),
         sa.Column("avg_response_time_s", sa.Float(), nullable=True),
         sa.Column("min_response_time_s", sa.Float(), nullable=True),
         sa.Column("max_response_time_s", sa.Float(), nullable=True),
-        sa.Column("uptime_percentage", sa.Float(), nullable=False),
-        sa.Column("sla_met", sa.Boolean(), nullable=False),
+        sa.Column("achieved_target", sa.Boolean(), nullable=False),
+        sa.Column("sla_month", sa.Float(), nullable=True),
         sa.Column(
             "created_at", sa.DateTime(), server_default=sa.func.now(), nullable=False
         ),
@@ -114,17 +118,17 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint(
-            "monitoring_task_id", "date", name="uq_daily_metric_task_date"
+            "monitoring_task_id", "date", name="uq_monthly_metric_task_date"
         ),
     )
     op.create_index(
-        "ix_daily_metrics_task_id", "daily_metrics", ["monitoring_task_id"]
+        "ix_monthly_metrics_task_id", "monthly_metrics", ["monitoring_task_id"]
     )
 
 
 def downgrade() -> None:
-    op.drop_index("ix_daily_metrics_task_id", table_name="daily_metrics")
-    op.drop_table("daily_metrics")
+    op.drop_index("ix_monthly_metrics_task_id", table_name="monthly_metrics")
+    op.drop_table("monthly_metrics")
 
     op.drop_index("ix_incidents_task_id", table_name="incidents")
     op.drop_table("incidents")

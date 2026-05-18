@@ -38,6 +38,6 @@ class MonitoringTask(Base, BaseModelMixin):
     incidents = relationship(
         "Incident", back_populates="monitoring_task", cascade="all, delete-orphan"
     )
-    daily_metrics = relationship(
-        "DailyMetric", back_populates="monitoring_task", cascade="all, delete-orphan"
+    monthly_metrics = relationship(
+        "MonthlyMetric", back_populates="monitoring_task", cascade="all, delete-orphan"
     )
