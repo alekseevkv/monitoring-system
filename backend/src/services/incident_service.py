@@ -2,10 +2,12 @@ from typing import Sequence
 from datetime import datetime, timezone
 from fastapi import Depends, HTTPException, status
 
-from src.models.incident import IncidentStatus
+from src.models.incident import IncidentStatus, Incident
+from src.models.monitoring_task import MonitoringTask
 from src.repositories.incidents import IncidentRepository, get_incident_repository
 from src.schemas.incident_schema import (
-    IncidentListResponse, IncidentResponse, IncidentCreate, IncidentUpdate
+    IncidentListResponse, IncidentResponse, IncidentCreate, IncidentUpdate,
+    UptimeResponse, UptimeListResponse
 )
 
 class IncidentService:
@@ -103,6 +105,48 @@ class IncidentService:
             if open_incident is not None:
                 # Закрываем инцидент
                 await self.resolve(open_incident, check_id)
+
+    async def get_uptime(self, tasks: list[MonitoringTask]) -> UptimeListResponse:
+        if not tasks:
+            return UptimeListResponse(items=[])
+
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        task_ids = [t.id for t in tasks]
+        uptime_data = await self.repo.get_uptime_data(task_ids)
+
+        items: list[UptimeResponse] = []
+        for task in tasks:
+            data = uptime_data[task.id]
+            open_incident: Incident | None = data["open"]
+            last_resolved: Incident | None = data["last_resolved"]
+
+            if open_incident is not None:
+                incident_duration_s = round((now - open_incident.started_at).total_seconds(), 2)
+                items.append(UptimeResponse(
+                    monitoring_task_id=task.id,
+                    monitoring_task_name=task.name,
+                    monitoring_task_method=task.http_method,
+                    is_incident=True,
+                    uptime_s=None,
+                    incident_duration_s=incident_duration_s,
+                ))
+            else:
+                if last_resolved is not None:
+                    resolved_at = last_resolved.resolved_at
+                    if resolved_at is not None:
+                        uptime_s = round((now - resolved_at).total_seconds(), 2)
+                else:
+                    # Инцидентов не было — uptime с момента создания задачи
+                    uptime_s = round((now - task.created_at).total_seconds(), 2)
+                items.append(UptimeResponse(
+                    monitoring_task_id=task.id,
+                    monitoring_task_name=task.name,
+                    monitoring_task_method=task.http_method,
+                    is_incident=False,
+                    uptime_s=uptime_s,
+                    incident_duration_s=None,
+                ))
+        return UptimeListResponse(items=items)
 
 async def get_incident_service(
     repo: IncidentRepository = Depends(get_incident_repository),
