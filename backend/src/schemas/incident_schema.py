@@ -59,3 +59,16 @@ class OpenIncidentResponse(IncidentCreate):
 
 class OpenIncidentListResponse(BaseModel):
     items: list[OpenIncidentResponse]
+
+
+class UptimeResponse(BaseModel):
+    monitoring_task_id: int
+    monitoring_task_name: str | None
+    monitoring_task_method: str | None
+    is_incident: bool
+    uptime_s: float | None
+    incident_duration_s: float | None
+
+
+class UptimeListResponse(BaseModel):
+    items: list[UptimeResponse]
