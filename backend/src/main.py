@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.v1.check_result_api import router as check_result_router
 from src.api.v1.monitoring_task_api import router as monitoring_tasks_router
+from src.api.v1.sla_metrics_api import router as sla_router
 from src.configs.app import settings
 from src.helpers.monitoring_scheduler import monitoring_scheduler
 
@@ -47,4 +48,9 @@ app.include_router(
     check_result_router,
     prefix="/api/v1",
     tags=["Результаты проверок и инциденты"],
+)
+app.include_router(
+    sla_router,
+    prefix="/api/v1/sla",
+    tags=["Расчет SLA"],
 )
