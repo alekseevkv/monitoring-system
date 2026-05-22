@@ -11,3 +11,11 @@ db_user = "user"
 db_password = "password"
 db_host = "db"
 db_port = 5432
+
+[email_settings]
+smtp_host = "smtp.gmail.com"
+smtp_port = 587
+smtp_user = ""
+smtp_password = ""
+smtp_from = "monitoring@example.com"
+smtp_tls = true
