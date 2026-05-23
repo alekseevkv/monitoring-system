@@ -1,4 +1,6 @@
 import time
+from datetime import datetime
+
 from fastapi import Depends, HTTPException, status
 import httpx
 
@@ -62,6 +64,12 @@ class CheckResultService:
                 detail="No checks found for this task",
             )
         return CheckResultRead.model_validate(model)
+
+    async def get_stats_for_period(self, task_id: int, start: datetime, end: datetime) -> dict:
+        return await self.repo.get_stats_for_period(task_id, start, end)
+
+    async def get_first_check_time(self, task_id: int) -> datetime | None:
+        return await self.repo.get_first_check_time(task_id)
 
     async def perform_http_check(self, task: MonitoringTask) -> CheckResultUpdate:
         start = time.perf_counter()

@@ -10,6 +10,7 @@ from src.configs.app import settings
 from src.models.base import Base
 from src.models.monitoring_task import MonitoringTask  # noqa: F401
 from src.models.responsible_person import ResponsiblePerson  # noqa: F401
+from src.notifications.models import Notification  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

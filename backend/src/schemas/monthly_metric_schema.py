@@ -8,7 +8,7 @@ class MonthlyMetricRead(BaseModel):
 
     id: int
     monitoring_task_id: int
-    date: date
+    metric_date: date
     total_checks: int
     successful_checks: int
     failed_checks: int

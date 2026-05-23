@@ -2,7 +2,7 @@ from typing import Sequence
 from datetime import datetime, timezone
 
 from fastapi import Depends
-from sqlalchemy import func, select
+from sqlalchemy import func, select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_session
@@ -90,7 +90,78 @@ class IncidentRepository:
         )
         rows = list((await self.db.execute(stmt)).scalars().all())
         return rows, total
+    
+    async def get_last_open_for_tasks(self, task_ids: list[int]) -> Sequence[Incident] | None:
+        stmt = (
+            select(Incident)
+            .where(
+                Incident.monitoring_task_id.in_(task_ids),
+                Incident.status == IncidentStatus.OPEN,
+            )
+        )
+        return (await self.db.execute(stmt)).scalars().all()
+    
+    async def get_last_resolved_for_tasks(self, task_ids: list[int]) -> Sequence[Incident] | None:
+        if not task_ids:
+            return None
+        sub_stmt = (
+            select(
+                Incident,
+                func.row_number().over(
+                    partition_by=Incident.monitoring_task_id,
+                    order_by=Incident.resolved_at.desc().nulls_last()
+                ).label('row_number')
+            )
+            .where(
+                and_(
+                    Incident.monitoring_task_id.in_(task_ids),
+                    Incident.status == IncidentStatus.RESOLVED,
+                    Incident.resolved_at.isnot(None)
+                )
+            )
+            .subquery()
+        )
+        stmt = (
+            select(Incident)
+            .select_from(sub_stmt)
+            .where(sub_stmt.c.row_number == 1)
+            .order_by(sub_stmt.c.monitoring_task_id)
+        )
+        return (await self.db.execute(stmt)).scalars().all()
 
+    async def get_uptime_data(self, task_ids: list[int]) -> dict[int, dict]:
+        """
+        {
+            task_id: {
+                "open": Incident | None,  # открытый инцидент
+                "last_resolved": Incident | None  # последний закрытый инцидент
+            }
+        }
+        """
+        if not task_ids:
+            return {}
+        # Последние открытые инциденты для task_ids
+        open_incidents = await self.get_last_open_for_tasks(task_ids)
+        open_by_task: dict[int, Incident] = {}
+        if open_incidents:
+            for incident in open_incidents:
+                open_by_task[incident.monitoring_task_id] = incident
+        
+        # Последние закрытые инциденты для задач без открытого инцидента
+        ids_without_open = [task_id for task_id in task_ids if task_id not in open_by_task]
+        last_resolved_by_task: dict[int, Incident] = {}
+        resolved_incidents = await self.get_last_resolved_for_tasks(ids_without_open)
+        if resolved_incidents:
+            for incident in resolved_incidents:
+                last_resolved_by_task[incident.monitoring_task_id] = incident
+
+        return {
+            task_id: {
+                "open": open_by_task.get(task_id),
+                "last_resolved": last_resolved_by_task.get(task_id),
+            }
+            for task_id in task_ids
+        }
 
 async def get_incident_repository(
     db: AsyncSession = Depends(get_session),

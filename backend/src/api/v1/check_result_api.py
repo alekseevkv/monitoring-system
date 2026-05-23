@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, Query, status
 
+from src.repositories.monitoring_task import MonitoringTaskRepository, get_monitoring_task_repository
 from src.services.check_result_service import CheckResultService, get_check_result_service
 from src.services.incident_service import IncidentService, get_incident_service
 from src.helpers.orchestrator import Orchestrator, get_orchestrator
 from src.schemas.check_result_schema import CheckResultRead, CheckResultListResponse
-from src.schemas.incident_schema import IncidentListResponse, OpenIncidentListResponse
+from src.schemas.incident_schema import IncidentListResponse, OpenIncidentListResponse, UptimeListResponse
 
 router = APIRouter()
 
@@ -62,3 +63,17 @@ async def get_open_incidents(
     service: Orchestrator = Depends(get_orchestrator)
 ):
     return await service.get_open_incidents()
+
+
+@router.get(
+    "/uptime",
+    status_code=status.HTTP_200_OK,
+    response_model=UptimeListResponse,
+    summary="Текущий uptime/длительность активного инцидента для активных задач"
+)
+async def get_uptime(
+    service: IncidentService = Depends(get_incident_service),
+    repo: MonitoringTaskRepository = Depends(get_monitoring_task_repository),
+):
+    tasks = await repo.get_active()
+    return await service.get_uptime(tasks)

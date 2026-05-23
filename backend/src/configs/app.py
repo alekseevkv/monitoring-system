@@ -35,9 +35,19 @@ class DBConfig(BaseModel):
         return self.dsl
 
 
+class EmailConfig(BaseModel):
+    smtp_host: str
+    smtp_port: int
+    smtp_user: str
+    smtp_password: str
+    smtp_from: str
+    smtp_tls: bool
+
+
 class Settings(BaseModel):
     app: APPConfig
     db: DBConfig
+    email: EmailConfig
 
 
 env_settings = Dynaconf(settings_file=["settings.toml"])
@@ -45,4 +55,5 @@ env_settings = Dynaconf(settings_file=["settings.toml"])
 settings = Settings(
     app=env_settings["app_settings"],
     db=env_settings["db_settings"],
+    email=env_settings["email_settings"],
 )
