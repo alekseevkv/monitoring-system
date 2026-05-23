@@ -15,8 +15,8 @@ class SLAMetricRepository:
         stmt = (
             select(MonthlyMetric)
             .options(selectinload(MonthlyMetric.monitoring_task))
-            .where(MonthlyMetric.date >= start_date)
-            .order_by(MonthlyMetric.monitoring_task_id, MonthlyMetric.date)
+            .where(MonthlyMetric.metric_date >= start_date)
+            .order_by(MonthlyMetric.monitoring_task_id, MonthlyMetric.metric_date)
         )
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
@@ -27,8 +27,8 @@ class SLAMetricRepository:
             .options(selectinload(MonthlyMetric.monitoring_task))
             .where(
                 MonthlyMetric.monitoring_task_id == task_id,
-                extract('year', MonthlyMetric.date) == month.year,
-                extract('month', MonthlyMetric.date) == month.month
+                extract('year', MonthlyMetric.metric_date) == month.year,
+                extract('month', MonthlyMetric.metric_date) == month.month
             )
         )
         result = await self.db.execute(stmt)
