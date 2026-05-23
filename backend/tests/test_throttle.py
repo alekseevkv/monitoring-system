@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.notifications.service import REMINDER_INTERVAL, determine_trigger
+from src.services.notification_service import REMINDER_INTERVAL, determine_trigger
 
 
 def make_notification(trigger_type: str, sent_at: datetime) -> MagicMock:
