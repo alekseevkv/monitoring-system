@@ -9,6 +9,7 @@ from src.schemas.incident_schema import (
     IncidentListResponse, IncidentResponse, IncidentCreate, IncidentUpdate,
     UptimeResponse, UptimeListResponse
 )
+from src.services.notification_service import notify_incident
 
 class IncidentService:
     def __init__(self, repo: IncidentRepository):
@@ -99,12 +100,16 @@ class IncidentService:
                     started_by_check_id=check_id,
                     description=error_message
                 )
-                await self.create(create_data)
+                incident = await self.create(create_data)
+                await notify_incident(self.repo.session, incident.id, "down")
+            else:
+                await notify_incident(self.repo.session, open_incident.id, "down")
 
         else:
             if open_incident is not None:
                 # Закрываем инцидент
                 await self.resolve(open_incident, check_id)
+                await notify_incident(self.repo.session, open_incident.id, "up")
 
     async def get_uptime(self, tasks: list[MonitoringTask]) -> UptimeListResponse:
         if not tasks:
