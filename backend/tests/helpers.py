@@ -28,7 +28,7 @@ def fake_incident_row(**overrides) -> SimpleNamespace:
         id=1,
         monitoring_task_id=10,
         status=IncidentStatus.OPEN,
-        started_at=NOW,
+        started_at=NOW.replace(tzinfo=None),
         resolved_at=None,
         started_by_check_id=100,
         resolved_by_check_id=None,
