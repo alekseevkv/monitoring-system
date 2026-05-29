@@ -10,6 +10,7 @@ dependencies = [
     "asyncpg>=0.31.0",
     "dynaconf>=3.2.13",
     "fastapi[standard]>=0.135.3",
+    "greenlet>=3.3.2",
     "pytest-asyncio>=1.4.0",
     "sqlalchemy>=2.0.49",
 ]

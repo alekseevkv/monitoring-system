@@ -101,15 +101,15 @@ class IncidentService:
                     description=error_message
                 )
                 incident = await self.create(create_data)
-                await notify_incident(self.repo.session, incident.id, "down")
+                await notify_incident(self.repo.db, incident.id, "down")
             else:
-                await notify_incident(self.repo.session, open_incident.id, "down")
+                await notify_incident(self.repo.db, open_incident.id, "down")
 
         else:
             if open_incident is not None:
                 # Закрываем инцидент
                 await self.resolve(open_incident, check_id)
-                await notify_incident(self.repo.session, open_incident.id, "up")
+                await notify_incident(self.repo.db, open_incident.id, "up")
 
     async def get_uptime(self, tasks: list[MonitoringTask]) -> UptimeListResponse:
         if not tasks:
