@@ -22,3 +22,9 @@
   font-size: 18px;
   font-weight: 500;
 }
+
+.uptimeReportContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}

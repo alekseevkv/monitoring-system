@@ -34,5 +34,5 @@ export const IncidentsTable = () => {
     [incidents],
   );
 
-  return <Table data={tableData} />;
+  return <Table striped data={tableData} />;
 };
