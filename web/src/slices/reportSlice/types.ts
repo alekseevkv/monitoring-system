@@ -40,6 +40,23 @@ export type SlaReport = {
   items: SlaReportItem[];
 };
 
+export type TaskMetrics = {
+  id: number;
+  name: string;
+  sla_month: number;
+  successful_checks: number;
+  failed_checks: number;
+  total_checks: number;
+  success_rate: number;
+  incident_count: number;
+  total_downtime_seconds: number;
+  total_uptime_seconds: number;
+  avg_response_time_s: number;
+  min_response_time_s: number;
+  max_response_time_s: number;
+  achieved_target: boolean;
+};
+
 export type ReportSchema = {
   incidents: Incident[];
   incidentsLoading: boolean;
@@ -50,4 +67,7 @@ export type ReportSchema = {
   slaReport: SlaReport;
   slaReportLoading: boolean;
   slaReportError: string | null;
+  taskMetrics: TaskMetrics | null;
+  taskMetricsLoading: boolean;
+  taskMetricsError: string | null;
 };

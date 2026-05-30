@@ -1,3 +1,4 @@
+import { fetchTaskMetrics } from '@/slices/reportSlice/services/fetchTaskMetrics';
 import { createSlice } from '@reduxjs/toolkit';
 
 import { fetchIncidents } from './services/fetchIncidents';
@@ -19,6 +20,9 @@ const initialState: ReportSchema = {
   },
   slaReportLoading: false,
   slaReportError: null,
+  taskMetrics: null,
+  taskMetricsLoading: false,
+  taskMetricsError: null,
 };
 
 export const reportSlice = createSlice({
@@ -68,6 +72,18 @@ export const reportSlice = createSlice({
     builder.addCase(fetchSlaReport.rejected, (state, action) => {
       state.slaReportLoading = false;
       state.slaReportError = action.payload ?? null;
+    });
+    builder.addCase(fetchTaskMetrics.pending, (state) => {
+      state.taskMetricsError = null;
+      state.taskMetricsLoading = true;
+    });
+    builder.addCase(fetchTaskMetrics.fulfilled, (state, action) => {
+      state.taskMetricsLoading = false;
+      state.taskMetrics = action.payload;
+    });
+    builder.addCase(fetchTaskMetrics.rejected, (state, action) => {
+      state.taskMetricsLoading = false;
+      state.taskMetricsError = action.payload ?? null;
     });
   },
 });

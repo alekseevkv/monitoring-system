@@ -1,37 +1,57 @@
-import { useMemo } from 'react';
+import { Link } from 'react-router';
 
 import { useAppSelector } from '@/hook';
 import { getReportSla } from '@/slices/reportSlice/selectors';
 import { getMonthName } from '@/utils';
-import { Table } from '@mantine/core';
+import { Anchor, Table } from '@mantine/core';
 
-import type { TableData } from '@mantine/core';
 import type { SlaReportItem } from '@/slices/reportSlice/types';
 export const SlaTable = () => {
   const slaData = useAppSelector(getReportSla);
+  const columnsCount = slaData.months.length + 1;
 
-  const tableData = useMemo(() => {
-    const columnsCount = slaData.months.length + 1;
-
-    return slaData.items.reduce<TableData>(
-      (acc, item) => {
-        acc.body?.push(
-          new Array(columnsCount).fill(null).map((_, idx) => {
-            return idx === 0
-              ? item.name
-              : (item[`month_${idx}` as keyof SlaReportItem] as number).toFixed(
-                  3,
-                );
-          }),
-        );
-        return acc;
-      },
-      {
-        head: ['Сервис', ...slaData.months.map((m) => getMonthName(m))],
-        body: [],
-      },
-    );
-  }, [slaData.items, slaData.months]);
-
-  return <Table striped data={tableData} />;
+  return (
+    <Table striped>
+      <Table.Thead>
+        <Table.Tr>
+          {['Сервис', ...slaData.months.map((m) => getMonthName(m))].map(
+            (clmName, idx) => (
+              <Table.Th
+                key={`${clmName}-${idx}`}
+                styles={{ th: { textTransform: 'capitalize' } }}
+              >
+                {clmName}
+              </Table.Th>
+            ),
+          )}
+        </Table.Tr>
+      </Table.Thead>
+      <Table.Tbody>
+        {slaData.items.map((item) => (
+          <Table.Tr key={item.id}>
+            {new Array(columnsCount).fill(null).map((_, idx) => {
+              return (
+                <Table.Td key={`${item.name}-${idx}`}>
+                  {idx === 0 ? (
+                    <Anchor
+                      component={Link}
+                      to={`/report/${item.id}/`}
+                      underline="never"
+                      fz={14}
+                    >
+                      {item.name}
+                    </Anchor>
+                  ) : (
+                    (
+                      item[`month_${idx}` as keyof SlaReportItem] as number
+                    ).toFixed(3)
+                  )}
+                </Table.Td>
+              );
+            })}
+          </Table.Tr>
+        ))}
+      </Table.Tbody>
+    </Table>
+  );
 };

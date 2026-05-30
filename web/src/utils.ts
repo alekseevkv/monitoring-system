@@ -66,3 +66,33 @@ export function getMonthName(
 
   return new Intl.DateTimeFormat(locale, { month: style }).format(d);
 }
+
+export interface FormatNumberOptions {
+  fractionDigits?: number;
+  locale?: string;
+  useGrouping?: boolean;
+  fallback?: string;
+}
+
+export function formatNumber(
+  value: number | string | null | undefined,
+  options: FormatNumberOptions = {},
+): string {
+  const {
+    fractionDigits = 3,
+    locale = 'ru-RU',
+    useGrouping = true,
+    fallback = '',
+  } = options;
+
+  if (value === null || value === undefined || value === '') return fallback;
+
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  if (isNaN(num)) return fallback;
+
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+    useGrouping,
+  }).format(num);
+}
