@@ -101,9 +101,9 @@ export const TaskForm = ({ taskId, initialValues }: Props) => {
         if (taskId) {
           dispatch(updateTask({ taskId, task: values }));
         } else {
-          dispatch(createTask({ task: values })).then(({ meta, payload }) => {
-            if (meta.requestStatus === 'fulfilled' && (payload as Task)?.id) {
-              navigate(`/tasks/${(payload as Task).id}/`);
+          dispatch(createTask({ task: values })).then(({ meta }) => {
+            if (meta.requestStatus === 'fulfilled') {
+              navigate(`/tasks/`);
             }
           });
         }

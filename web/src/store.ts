@@ -1,4 +1,5 @@
 import { api } from '@/api';
+import { reportReducer } from '@/slices/reportSlice/reportSlice';
 import { taskReducer } from '@/slices/taskSlice/taskSlice';
 import { configureStore } from '@reduxjs/toolkit';
 
@@ -10,6 +11,7 @@ const extraArg: ThunkExtraArg = {
 export const store = configureStore({
   reducer: {
     task: taskReducer,
+    report: reportReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
