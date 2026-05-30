@@ -13,8 +13,8 @@ export const IncidentsTable = () => {
     () =>
       incidents.reduce<TableData>(
         (acc, { monitoring_task_name, started_at }) => {
-          const { minutes } = getTimeDifference(started_at);
-
+          const { days, hours, minutes } = getTimeDifference(started_at);
+          const duration = `${days} дн ${hours} ч ${minutes} мин`;
           acc.body?.push([
             monitoring_task_name,
             new Date(started_at).toLocaleDateString('ru-Ru', {
@@ -22,7 +22,7 @@ export const IncidentsTable = () => {
               minute: 'numeric',
               second: 'numeric',
             }),
-            `${minutes} минут`,
+            duration,
           ]);
           return acc;
         },

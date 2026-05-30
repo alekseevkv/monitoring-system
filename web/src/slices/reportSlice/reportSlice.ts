@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import { fetchIncidents } from './services/fetchIncidents';
+import { fetchSlaReport } from './services/fetchSlaReport';
 import { fetchUptimeReport } from './services/fetchUptimeReport';
 
 import type { ReportSchema } from './types';
@@ -12,6 +13,12 @@ const initialState: ReportSchema = {
   uptimeReport: [],
   uptimeReportLoading: false,
   uptimeReportError: null,
+  slaReport: {
+    months: [],
+    items: [],
+  },
+  slaReportLoading: false,
+  slaReportError: null,
 };
 
 export const reportSlice = createSlice({
@@ -49,6 +56,18 @@ export const reportSlice = createSlice({
     builder.addCase(fetchUptimeReport.rejected, (state, action) => {
       state.uptimeReportLoading = false;
       state.uptimeReportError = action.payload ?? null;
+    });
+    builder.addCase(fetchSlaReport.pending, (state) => {
+      state.slaReportError = null;
+      state.slaReportLoading = true;
+    });
+    builder.addCase(fetchSlaReport.fulfilled, (state, action) => {
+      state.slaReportLoading = false;
+      state.slaReport = action.payload;
+    });
+    builder.addCase(fetchSlaReport.rejected, (state, action) => {
+      state.slaReportLoading = false;
+      state.slaReportError = action.payload ?? null;
     });
   },
 });

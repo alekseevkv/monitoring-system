@@ -51,3 +51,18 @@ export function getTimeDifference(target: Date | string): TimeDifference {
 
   return { years, months, days, hours, minutes, seconds, totalDays, isFuture };
 }
+
+export type MonthStyle = 'long' | 'short' | 'narrow';
+
+export function getMonthName(
+  date: Date | string | number | null | undefined,
+  locale: string = 'ru-RU',
+  style: MonthStyle = 'long',
+): string {
+  if (!date) return '';
+
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return '';
+
+  return new Intl.DateTimeFormat(locale, { month: style }).format(d);
+}
