@@ -2,6 +2,7 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
 from src.models.incident import IncidentStatus
+from src.models.monitoring_task import MonitoringTask
 from .test_throttle import NOW
 
 def fake_check_row(**overrides) -> SimpleNamespace:
@@ -41,7 +42,7 @@ def fake_incident_row(**overrides) -> SimpleNamespace:
     return SimpleNamespace(**data)
 
 
-def fake_task(**overrides) -> SimpleNamespace:
+def fake_task_row(**overrides) -> SimpleNamespace:
     """Строка MonitoringTask ORM для perform_http_check / get_uptime"""
     data = dict(
         id=10,
@@ -58,6 +59,20 @@ def fake_task(**overrides) -> SimpleNamespace:
     )
     data.update(overrides)
     return SimpleNamespace(**data)
+
+
+def real_task_row(**overrides) -> MonitoringTask:
+    """MonitoringTask для _make_trigger / schedule_task"""
+    data = dict(
+        id=10,
+        name="Сервис example.com",
+        url="https://example.com/health",
+        is_active=True,
+        cron_expression=None,
+        check_interval_seconds=300,
+    )
+    data.update(overrides)
+    return MonitoringTask(**data)
 
 
 def fake_response(status_code=200, text="ok", headers=None) -> SimpleNamespace:
@@ -80,3 +95,11 @@ def make_async_client(request_return=None, request_side_effect=None):
     cm.__aenter__ = AsyncMock(return_value=client)
     cm.__aexit__ = AsyncMock(return_value=False)
     return cm, request_mock
+
+
+def make_session_maker(session):
+    """Мок async_session_maker"""
+    cm = MagicMock()
+    cm.__aenter__ = AsyncMock(return_value=session)
+    cm.__aexit__ = AsyncMock(return_value=False)
+    return MagicMock(return_value=cm)

@@ -13,7 +13,7 @@ from src.schemas.check_result_schema import (
 )
 from tests.helpers import (
     fake_check_row,
-    fake_task,
+    fake_task_row,
     fake_response,
     make_async_client,
 )
@@ -148,7 +148,7 @@ class TestPerformHttpCheck:
                 status_code=200, text="success", headers={"x-trace": "abc"}
             )
         )
-        task = fake_task(
+        task = fake_task_row(
             expected_status_code=200,
             http_method="GET",
             headers={"Authorization": "Bearer secret"},
@@ -173,7 +173,7 @@ class TestPerformHttpCheck:
 
     async def test_status_mismatch(self, service):
         cm, _ = make_async_client(request_return=fake_response(status_code=503, text="failure"))
-        task = fake_task(expected_status_code=200)
+        task = fake_task_row(expected_status_code=200)
 
         with patch("src.services.check_result_service.httpx.AsyncClient", return_value=cm):
             result = await service.perform_http_check(task)
@@ -186,7 +186,7 @@ class TestPerformHttpCheck:
         cm, _ = make_async_client(
             request_return=fake_response(status_code=200, text="A" * 5000)
         )
-        task = fake_task(expected_status_code=200)
+        task = fake_task_row(expected_status_code=200)
 
         with patch("src.services.check_result_service.httpx.AsyncClient", return_value=cm):
             result = await service.perform_http_check(task)
@@ -195,7 +195,7 @@ class TestPerformHttpCheck:
 
     async def test_timeout(self, service):
         cm, _ = make_async_client(request_side_effect=httpx.TimeoutException("timed out"))
-        task = fake_task(timeout=3)
+        task = fake_task_row(timeout=3)
 
         with patch("src.services.check_result_service.httpx.AsyncClient", return_value=cm):
             result = await service.perform_http_check(task)
@@ -207,7 +207,7 @@ class TestPerformHttpCheck:
 
     async def test_exception(self, service):
         cm, _ = make_async_client(request_side_effect=httpx.ConnectError("connection refused"))
-        task = fake_task()
+        task = fake_task_row()
 
         with patch("src.services.check_result_service.httpx.AsyncClient", return_value=cm):
             result = await service.perform_http_check(task)

@@ -14,8 +14,8 @@ from src.schemas.incident_schema import (
     IncidentListResponse,
     UptimeListResponse,
 )
-from tests.helpers import fake_incident_row, fake_task
-from .test_throttle import NOW
+from tests.helpers import fake_incident_row, fake_task_row
+from tests.test_throttle import NOW
 
 @pytest.fixture
 def service(mock_incident_repo):
@@ -230,7 +230,7 @@ class TestGetUptime:
         mock_incident_repo.get_uptime_data.assert_not_awaited()
 
     async def test_task_with_open_incident(self, service, mock_incident_repo):
-        task = fake_task(id=10, name="API", http_method="GET")
+        task = fake_task_row(id=10, name="API", http_method="GET")
         open_incident = fake_incident_row(started_at=(NOW.replace(tzinfo=None) - timedelta(seconds=120)))
         mock_incident_repo.get_uptime_data.return_value = {
             10: {"open": open_incident, "last_resolved": None}
@@ -245,7 +245,7 @@ class TestGetUptime:
         assert item.incident_duration_s is not None and item.incident_duration_s > 0
 
     async def test_task_without_open_incident(self, service, mock_incident_repo):
-        task = fake_task(id=10)
+        task = fake_task_row(id=10)
         last_resolved = fake_incident_row(
             status=IncidentStatus.RESOLVED,
             resolved_at=(NOW.replace(tzinfo=None) - timedelta(seconds=300)),
@@ -262,7 +262,7 @@ class TestGetUptime:
         assert item.uptime_s is not None and item.uptime_s > 0
 
     async def test_task_without_incidents(self, service, mock_incident_repo):
-        task = fake_task(id=10, created_at=(NOW.replace(tzinfo=None) - timedelta(seconds=600)))
+        task = fake_task_row(id=10, created_at=(NOW.replace(tzinfo=None) - timedelta(seconds=600)))
         mock_incident_repo.get_uptime_data.return_value = {
             10: {"open": None, "last_resolved": None}
         }

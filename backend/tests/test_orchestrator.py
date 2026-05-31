@@ -7,9 +7,8 @@ from src.helpers.orchestrator import Orchestrator
 from src.models.incident import IncidentStatus
 from src.schemas.check_result_schema import CheckResultCreate, CheckResultUpdate
 from src.schemas.incident_schema import OpenIncidentListResponse, IncidentResponse
-from .helpers import fake_check_row, fake_incident_row, fake_task
-from .test_throttle import NOW
-
+from tests.helpers import fake_check_row, fake_incident_row, fake_task_row
+from tests.test_throttle import NOW
 
 @pytest.fixture
 def services():
@@ -18,7 +17,6 @@ def services():
         "incident": AsyncMock(),
         "task": AsyncMock(),
     }
-
 
 @pytest.fixture
 def orchestrator(services):
@@ -31,7 +29,7 @@ def orchestrator(services):
 
 class TestRunCheck:
     async def test_check_is_not_successful(self, orchestrator, services):
-        task = fake_task(id=10)
+        task = fake_task_row(id=10)
         created = fake_check_row(id=200, monitoring_task_id=10)
         raw_check = CheckResultUpdate(is_success=False, status_code=500, error_message="500 error")
         updated = fake_check_row(
@@ -65,7 +63,7 @@ class TestRunCheck:
         )
 
     async def test_check_is_successful(self, orchestrator, services):
-        task = fake_task(id=11)
+        task = fake_task_row(id=11)
         services["check"].create.return_value = fake_check_row(id=201)
         services["check"].perform_http_check.return_value = CheckResultUpdate(
             is_success=True, status_code=200
@@ -103,7 +101,7 @@ class TestGetOpenIncidents:
             )
         )
         services["incident"].get_open_raw.return_value = [incident]
-        services["task"].get_task.return_value = fake_task(
+        services["task"].get_task.return_value = fake_task_row(
             id=10, name="API", http_method="POST"
         )
 
