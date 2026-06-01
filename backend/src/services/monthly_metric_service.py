@@ -105,7 +105,7 @@ class MonthlyMetricService:
     async def compute_for_all_tasks(self) -> int:
         tasks = await self.task_repo.get_active()
         if not tasks:
-            return []
+            return 0
 
         task_ids = [t.id for t in tasks]
 
