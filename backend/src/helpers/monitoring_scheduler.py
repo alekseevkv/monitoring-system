@@ -16,9 +16,11 @@ from src.models.monitoring_task import MonitoringTask
 from src.repositories.monitoring_task import MonitoringTaskRepository
 from src.repositories.check_result import CheckResultRepository
 from src.repositories.incidents import IncidentRepository
+from src.repositories.monthly_metric import MonthlyMetricRepository
 from src.services.check_result_service import CheckResultService
 from src.services.incident_service import IncidentService
 from src.services.monitoring_task_service import MonitoringTaskService
+from src.services.monthly_metric_service import MonthlyMetricService
 from src.helpers.orchestrator import Orchestrator
 
 logger = logging.getLogger(__name__)
@@ -29,6 +31,15 @@ class MonitoringScheduler:
 
     def start(self) -> None:
         self._scheduler.start()
+        job = self._scheduler.add_job(
+            _run_compute_for_all_tasks,
+            trigger=CronTrigger(day="1", hour="0", minute="30"),
+            id="compute_monthly_metrics",
+            name="Compute Monthly Metrics",
+            replace_existing=True,
+            misfire_grace_time=3600,
+        )
+        logger.info(f"System job scheduled: {job.name} (id={job.id}), next run time: {job.next_run_time}")
 
     def shutdown(self) -> None:
         self._scheduler.shutdown(wait=False)
@@ -111,3 +122,16 @@ def _build_orchestrator(session) -> Orchestrator:
     incident_service = IncidentService(IncidentRepository(session))
     task_service = MonitoringTaskService(MonitoringTaskRepository(session))
     return Orchestrator(check_service, incident_service, task_service)
+
+async def _run_compute_for_all_tasks() -> None:
+    """Запуск расчета метрик SLA за месяц для всех задач"""
+    async with async_session_maker() as session:
+        try:
+            repo = MonthlyMetricRepository(session)
+            task_repo = MonitoringTaskRepository(session)
+            check_service = CheckResultService(CheckResultRepository(session))
+            service = MonthlyMetricService(repo, task_repo, check_service, session)
+            await service.compute_for_all_tasks()
+            logger.info("Successfully computed monthly metrics for all active tasks")
+        except Exception:
+            logger.exception("Error while computing monthly metrics for all tasks")

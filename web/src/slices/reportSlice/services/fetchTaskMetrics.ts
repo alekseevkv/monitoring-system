@@ -18,8 +18,8 @@ export const fetchTaskMetrics = createAsyncThunk<
   'report/fetchTaskMetrics',
   async ({ taskId, month }, { rejectWithValue, extra }) => {
     try {
-      const { data } = await extra.api.get<TaskMetrics>('/sla/{id}/', {
-        params: { task_id: taskId, month },
+      const { data } = await extra.api.get<TaskMetrics>('/sla/${taskId}/', {
+        params: { month },
       });
 
       if (!data) {
